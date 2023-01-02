@@ -12,11 +12,12 @@ export const propertySchema: SchemaOf<IPropertyRequest> = yup.object().shape({
 });
 
 export const returnedPropertiesSchema = yup.object().shape({
+  id: yup.string().notRequired(),
   sold: yup.boolean().notRequired(),
   value: yup.string().notRequired(),
   size: yup.number().notRequired(),
   address: addressesSchema,
   category: yup.string().notRequired(),
-  createdAt: yup.string().notRequired(),
-  updatedAt: yup.string().notRequired(),
+  createdAt: yup.date().notRequired(),
+  updatedAt: yup.date().notRequired(),
 });

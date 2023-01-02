@@ -6,7 +6,7 @@ import { listAllSchedulesByPropertyService } from "../services/Schedules/listAll
 
 export const createScheduleController = async (req: Request, res: Response) => {
   const scheduleData: IScheduleRequest = req.body;
-  const userId: IUserAuthRequest = req.user;
+  const userId: string = req.user.id;
 
   const schedule = await createScheduleService(scheduleData, userId);
 

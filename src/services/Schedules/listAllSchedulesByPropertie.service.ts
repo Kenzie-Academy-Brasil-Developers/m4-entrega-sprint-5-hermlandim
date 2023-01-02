@@ -2,6 +2,7 @@ import AppDataSource from "../../data-source";
 import { Properties } from "../../entities/properties.entity";
 import { SchedulesUsersProperties } from "../../entities/schedulesUsersProperties.entity";
 import { AppError } from "../../errors/AppError";
+import { listAllSchedulesSchema } from "../../schemas/schedules.schemas";
 
 export const listAllSchedulesByPropertyService = async (idProperty: string) => {
   const propertieRepository = AppDataSource.getRepository(Properties);
@@ -31,5 +32,9 @@ export const listAllSchedulesByPropertyService = async (idProperty: string) => {
     schedules: findSchedules,
   };
 
-  return schedules;
+  const returnedData = await listAllSchedulesSchema.validate(schedules, {
+    stripUnknown: true,
+  });
+
+  return returnedData;
 };

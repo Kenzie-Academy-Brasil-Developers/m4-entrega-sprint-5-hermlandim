@@ -43,13 +43,7 @@ export const createPropertieService = async (propertie: IPropertyRequest) => {
     address,
   });
 
-  console.log(newPropertie);
-
   await propertieRepository.save(newPropertie);
-
-  // const returnedData = await propertiesSchema.validate(newPropertie, {
-  //   stripUnknown: true,
-  // });
 
   return newPropertie;
 };

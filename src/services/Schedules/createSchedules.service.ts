@@ -4,14 +4,10 @@ import { SchedulesUsersProperties } from "../../entities/schedulesUsersPropertie
 import { User } from "../../entities/user.entity";
 import { AppError } from "../../errors/AppError";
 import { IScheduleRequest } from "../../interfaces/schedules";
-import { IUserAuthRequest } from "../../interfaces/users";
-import ensureAuthMiddleware from "../../middlewares/ensureAuth.middleware";
-import { ensureDataIsValid } from "../../middlewares/ensureDataIsValid.middleware";
-import { schedulesHoursSchema } from "../../schemas/schedules.schemas";
 
 export const createScheduleService = async (
   scheduleData: IScheduleRequest,
-  userId: IUserAuthRequest
+  userId: string
 ) => {
   const schedulesRepository = AppDataSource.getRepository(
     SchedulesUsersProperties
@@ -22,24 +18,8 @@ export const createScheduleService = async (
   const userRepository = AppDataSource.getRepository(User);
 
   const findUser = await userRepository.findOneBy({
-    id: scheduleData.userId,
+    id: userId,
   });
-
-  const querySchedules = await AppDataSource.createQueryBuilder()
-    .select(["schedules"])
-    .from(SchedulesUsersProperties, "schedules")
-    .where(
-      "schedules.property = :id_property AND schedules.hour = :hour_schedules",
-      {
-        id_property: scheduleData.propertyId,
-        hour_schedules: scheduleData.hour,
-      }
-    )
-    .getOne();
-
-  if (querySchedules) {
-    throw new AppError("schedule unavailable!", 409);
-  }
 
   const verifyHour = scheduleData.hour.split(":");
   const verifyObjHours = {
@@ -68,6 +48,38 @@ export const createScheduleService = async (
 
   if (day == 6 || day == 0) {
     throw new AppError("Appointments allowed only from Monday - Friday", 400);
+  }
+
+  const querySchedulesExists = await AppDataSource.createQueryBuilder()
+    .select(["schedules"])
+    .from(SchedulesUsersProperties, "schedules")
+    .where(
+      "schedules.property = :id_property AND schedules.hour = :hour_schedules",
+      {
+        id_property: scheduleData.propertyId,
+        hour_schedules: scheduleData.hour,
+      }
+    )
+    .getOne();
+
+  if (querySchedulesExists) {
+    throw new AppError("schedule unavailable!", 409);
+  }
+
+  const querySchedulesHourExists = await AppDataSource.createQueryBuilder()
+    .select(["schedules"])
+    .from(SchedulesUsersProperties, "schedules")
+    .where("schedules.user = :id_user AND schedules.hour = :hour_schedules", {
+      id_user: userId,
+      hour_schedules: scheduleData.hour,
+    })
+    .getOne();
+
+  if (querySchedulesHourExists) {
+    throw new AppError(
+      "There is already another appointment at the same time",
+      409
+    );
   }
 
   const newSchedule = schedulesRepository.create({
