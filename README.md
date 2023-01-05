@@ -88,3 +88,17 @@ Após rodar um dos comandos aparecerá um log no seu terminal, contendo as infor
 
 
 ### Agora que já sabe como iniciar o seu projeto e rodar os testes, é hora de colocar a mão no código!
+
+Endpoints do serviço:
+Método	Endpoint	Responsabilidade
+POST	/users	Criação de usuário
+GET	/users	Lista todos os usuários
+PATCH	/users	Atualiza um usuário
+DELETE	/users/<id>	Realiza um soft delete no usuário
+POST	/login	Gera o token de autenticação
+POST	/categories	Criação de categoria
+GET	/categories/<id>/properties	Lista todos imóveis que pertencem a uma categoria
+POST	/properties	Criação de um imóvel
+GET	/properties	Lista todos os imóveis
+POST	/schedules	Agenda uma visita a um imóvel
+GET	/schedules/properties/<id>	lista todos os agendamentos de um imóvel
